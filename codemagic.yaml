@@ -13,10 +13,18 @@ workflows:
       - name: Get Flutter packages
         script: flutter pub get
 
-      - name: Prepare Firebase iOS config
+            - name: Prepare Firebase iOS config
         script: |
-          echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist
-          test -s ios/Runner/GoogleService-Info.plist
+          if [ -z "$GOOGLE_SERVICE_INFO_PLIST" ]; then
+            echo "ERROR: GOOGLE_SERVICE_INFO_PLIST is empty or unavailable"
+            exit 1
+          fi
+          echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist || exit 1
+          if [ ! -s ios/Runner/GoogleService-Info.plist ]; then
+            echo "ERROR: Firebase plist file is empty"
+            exit 1
+          fi
+          plutil -lint ios/Runner/GoogleService-Info.plist
 
       - name: Build iOS app
         script: flutter build ios --release --no-codesign
