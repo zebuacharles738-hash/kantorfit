@@ -8,6 +8,8 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+            groups:
+        - firebase_ios
 
     scripts:
       - name: Get Flutter packages
